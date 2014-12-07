@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Scrum On Demand</title>
+<script	src="plugins/jquery/jquery.min.js"></script>
+<script type='text/javascript' 	src="plugins/angularjs/angular.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" 	href="plugins/bootstrap/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" 	href="plugins/bootstrap/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="plugins/gritter/css/jquery.gritter.css" />
+<script type="text/javascript" src="plugins/gritter/js/jquery.gritter.js"></script>
+
+ <script src="script/sod.js"></script>
+
+<style>
+
+body {
+	font-family: Verdana, Arial, Sans-serif;
+	font-size: 1em;
+		
+}
+
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    //background-color: #fff;
+    cursor: auto;
+    opacity: 1;
+    }
+ 
+ .navbar-default {
+    background-color: BLUE;
+    border-color: #E7E7E7;
+    background-image: linear-gradient(to bottom, #f9f9f9 0px, #b9b9b9 100%);
+} 
+
+.upgrade:hover,.logged:hover,.removetask:hover,.teamdiv:hover {
+	cursor: pointer;
+	cursor: hand;
+	border-style: solid;
+	outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 20px #9ecaed;
+}
+
+.blue {
+  color: blue;
+}
+
+
+	
+</style>
+
+</head>
+<body ng-app="sodApp" ng-controller="SodController">
+
+
+
+
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+       <img alt="Movie Manager" width="50px" src="images/logo.gif">
+      <strong><font size="3" face="verdana" >Scrum On Demand</font></strong>&nbsp;v1.0&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      
+      <form class="navbar-form navbar-left" name="form" role="search" novalidate>
+
+      
+        
+         <img id="spinner" ng-src="images/spinner.gif" style="display:none;">
+         
+           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button  ng-click="refresh()" class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon glyphicon-refresh"></span> Refresh</button>
+          
+           
+        
+      </form>
+     
+     		<div class="pull-right">
+  			<div data-toggle="modal" data-target="#loginModel" ><span style="margin-right: 10px" ng-show="scrummaster" class="glyphicon glyphicon-tower blue"></span><span class="glyphicon glyphicon-user blue" aria-hidden="true"> </span><font style="font-weight:800; color: GREY" class="logged"> Logged: Ruhul (Log off)</font></div>
+			
+       		<div  ng-click="scrummaster = ! scrummaster" >	<font style="font-weight:800; color: GREY">
+        		<div style="margin-top: 10px"><span class="glyphicon glyphicon-tower"></span><span ng-show="!scrummaster" class="upgrade">Elevate Privilege </span>
+        		<span class="upgrade"  ng-show="scrummaster">Revoke Privilege </span>
+        		</div> </font>
+        	</div>
+       		</div>
+      
+      
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+<div class="panel panel-danger">
+  <div class="panel-heading">Blockers   
+  		<a style="margin-left: 20px" href  ng-click="showDetails = ! showDetails"  >
+  			<span ng-show="showDetails" class="glyphicon glyphicon-chevron-up">	</span><span ng-show="showDetails"> Hide </span>
+  			<span ng-show="!showDetails" class="glyphicon glyphicon-chevron-down"> </span>  <span ng-show="!showDetails">Show </span>
+  		</a>
+  		<button type="button" data-toggle="modal" data-target="#blockerModel" style="float: right; margin-left: 10px;" class="btn btn-primary btn-xs"> <span class="glyphicon glyphicon-plus"></span> Add Blocker</button>
+  	
+  </div>
+	  <div class="panel-body">
+	    <ul class="list-group" id="blocker_group" ng-show="showDetails">
+	   	  <li ng-repeat="blocker in blockers" class="list-group-item list-group-item-warning">
+	   	  	{{blocker.text}} <sub>{{blocker.sevirity}}</sub> <span class="pull-right"> - created by {{blocker.createdBy}}</span>
+	   	  
+	   	  	</li>   	
+	   </ul>
+	
+	  </div>
+</div>
+
+<div class="container-fluid">
+	<div class="row">	
+			<div class="col-md-2 ">
+			
+				<div ng-click="edit(userData.userName)" class="panel panel-default teamdiv"  >
+					  <div class="panel-heading "><span class="glyphicon glyphicon-user blue"></span> {{userData.userName}}</div>
+					  <div class="panel-body">
+					 <span class="label label-success">Yestarday</span>
+					  	<div  ng-repeat="task in userData.yestardayEntry">&nbsp;&nbsp;{{task.id}} : {{task.desc}}</div>
+					  	
+					  <span class="label label-success">Today&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					  	<div  ng-repeat="task in userData.todaysEtries">&nbsp;&nbsp;{{task.id}} : {{task.desc}}</div>  
+					  </div>
+					</div>
+			
+					<div ng-click="selectUser(key)" ng-repeat="(key, value)  in entries" class="panel panel-default teamdiv" >
+					  <div class="panel-heading"><span class="glyphicon glyphicon-user"></span> {{key}}</div>
+					  <div class="panel-body">
+					 <span class="label label-success">Yestarday</span>
+					  	<div  ng-repeat="task in value.yestardayEntry">&nbsp;&nbsp;{{task.id}} : {{task.desc}}</div>
+					  	
+					  <span class="label label-success">Today&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					  	<div  ng-repeat="task in value.todaysEtries">&nbsp;&nbsp;{{task.id}} : {{task.desc}}</div>  
+					  </div>
+					</div>
+			</div>
+		
+				<div class="col-md-10">
+				<div class="panel panel-default">
+
+					  <div class="panel-heading">Scrum Entries for {{selection.userName}}<button ng-show="isEditMode || scrummaster" ng-click="updateTask()" class="btn btn-default pull-right" type="button"><span class="glyphicon glyphicon-floppy-disk"></span> Save </button></div>
+					  <div class="panel-body">
+					  
+					  
+					 
+					  <button class="btn btn-success " type="button">
+							  Yestarday <span class="badge">{{selection.yestardayEntry.length}}</span>
+						</button> 
+						<button type="button"  data-toggle="modal" data-target="#yestardayModel" class="btn btn-default" aria-label="Left Align">
+						  <span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
+						</button>
+						
+					   <ul class="list-group">
+						  <li ng-repeat="entry in selection.yestardayEntry" class="list-group-item list-group-item-success ">
+						  <table>
+						  	<tr>
+						  		<td>
+						  			<input  ng-readonly="!isEditMode && !scrummaster " size="10" type="text" class="form-control" ng-model="entry.id" />
+						  		</td>
+						  		<td>
+						  			  <input  ng-readonly="!isEditMode && !scrummaster" type="text" size="100" class="form-control" ng-model="entry.desc" />
+						  		 </td>
+						  		 <td ng-show="isEditMode || scrummaster">
+						  		 	<span ng-click="removeTask($index,1)" style="margin-left: 10px;" class="glyphicon glyphicon-remove removetask">	</span>
+						  		 </td>
+						  	</tr>
+						  </table>			  
+						  
+						  </li>
+						 
+						</ul>
+						
+						 <button class="btn btn-info" type="button">
+							  Today&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="badge">{{selection.todaysEtries.length}}</span>
+						</button>
+						<button type="button" class="btn btn-default" aria-label="Left Align" data-toggle="modal" data-target="#todayModel">
+						  <span   class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
+						</button>
+					   <ul class="list-group">
+						  <li ng-repeat="entry in selection.todaysEtries" class="list-group-item list-group-item-info">
+							<table>
+							  	<tr>
+							  		<td>
+							  			<input  ng-readonly="!isEditMode && !scrummaster" size="10" type="text" class="form-control" ng-model="entry.id" />
+							  		</td>
+							  		<td>
+							  		  <input  ng-readonly="!isEditMode && !scrummaster" type="text" size="100" class="form-control" ng-model="entry.desc" />
+							  		  </td>
+							  		  <td ng-show="isEditMode || scrummaster">
+						  		 		<span ng-click="removeTask($index,2)" style="margin-left: 10px;" class="glyphicon glyphicon-remove removetask">	</span>
+						  			 </td>
+							  	</tr>
+						  </table>								  
+						  
+						  </li>
+						  
+						</ul>
+					  </div>
+				</div>
+				</div>
+	</div>	
+</div>		
+			
+	
+<div class="modal fade" id="yestardayModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add Yestarday's Task</h4>
+      </div>
+      <div class="modal-body">
+      		<table align="center">
+      			<tr>
+      				<td><input type="text" id="Yest_taskID" size="5" class="form-control" placeholder="TSK ID"></td>
+      				<td><input id="Yest_task_desc" type="text" class="form-control" placeholder="TSK DESC"></td>
+      			</tr>
+      		</table>		
+      </div>
+     
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" ng-click="saveSettings(1)" class="btn btn-primary">Add Task</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="todayModel" tabindex="-1" role="dialog" aria-labelledby="ADD_YEST_ModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="ADD_YEST_ModalLabel">Add Today's task</h4>
+      </div>
+      <div class="modal-body">
+      		<table align="center">
+      			<tr>
+      				<td><input type="text" id="today_taskID" size="5" class="form-control" placeholder="TSK ID"></td>
+      				<td><input id="Today_task_desc" type="text" class="form-control" placeholder="TSK DESC"></td>
+      			</tr>
+      		</table>	
+      </div>
+     
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" ng-click="saveSettings(2)" class="btn btn-primary">Add task</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="blockerModel" tabindex="-1" role="dialog" aria-labelledby="blockerLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="blockerLabel">Add new blocker</h4>
+      </div>
+      <div class="modal-body">
+      		
+      		<input id="blocker_desc" type="text" class="form-control" placeholder="Blocker description">
+      		<input id="blocker_sevrity" type="text" class="form-control" placeholder="Blocker sevirity">
+      			
+      </div>
+     
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" ng-click="addBlocker()" class="btn btn-primary">Add Blocker</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="loginModel" tabindex="-1" role="dialog" aria-labelledby="loginLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="loginLabel">Login</h4>
+      </div>
+      <div class="modal-body">
+      		<form role="form">
+       		   <div class="form-group">
+          		  <label for="usernName" class="control-label">User Name:</label>
+          		  <input type="text" class="form-control" id="userName" placeholder="User Name">
+          		</div>
+          	<div class="form-group">
+           		 <label for="password" class="control-label">Password:</label>
+          		 <input type="password" class="form-control" id="password" placeholder="Password"/>
+          </div>
+        </form>
+      			
+      </div>
+     
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" ng-click="login()" class="btn btn-primary">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

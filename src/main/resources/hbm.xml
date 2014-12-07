@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd"> 
+
+<hibernate-mapping>
+   <class name="com.ram.sod.dto.User" table="user_table">
+      <meta attribute="class-description">
+         This class contains the user details. 
+      </meta>
+      <id name="userName" type="string" column="userName">
+         <!-- <generator class="native"/> -->
+      </id>
+      <property name="firstName" column="firstName" type="string"/>
+      <property name="lastName" column="lastName" type="string"/>
+      <property name="password" column="password" type="string"/>
+      <property name="scrumMaster" column="scrumMaster" type="boolean"/>      
+   </class>
+   
+    <class name="com.ram.sod.dto.Team" table="team">
+      <meta attribute="class-description">
+         This class contains the team details. 
+      </meta>
+      <id name="teamName" type="string" column="teamName">
+         <!-- <generator class="native"/> -->
+      </id>
+      <property name="description" column="description" type="string"/>
+     <set name="users" cascade="save-update" table="TEAM_USER">
+         <key column="team_id"/>
+         <many-to-many column="user_id" class="com.ram.sod.dto.User"/>
+      </set>      
+   </class>
+   
+   <class name="com.ram.sod.dto.TaskEntry" table="taskentry">
+      <meta attribute="class-description">
+         This class contains the task entry details. 
+      </meta>
+      <id name="id" type="int" column="id">
+         <generator class="native"/> 
+      </id>
+      <property name="description" column="description" type="string"/>
+      <property name="timeSpent" column="timeSpent" type="int"/>
+      <property name="timeRemaining" column="timeRemaining" type="int"/>
+      <many-to-one name="task" column="task" 
+       class="com.ram.sod.dto.Task" not-null="true"/>
+      <property name="userName" column="userName" type="string"/>
+
+   </class>
+   
+    <class name="com.ram.sod.dto.Task" table="task">
+      <meta attribute="class-description">
+         This class contains the team details. 
+      </meta>
+      <id name="taskId" type="string" column="taskId">
+         <!-- <generator class="native"/> -->
+      </id>
+      <property name="taskdesc" column="taskdesc" type="string"/>
+      <property name="teamName" column="teamName" type="string"/>
+   </class>
+   
+    <class name="com.ram.sod.dto.ScrumEntry" table="scrumentry">
+      <meta attribute="class-description">
+         This class contains the team details. 
+      </meta>
+      <id name="id" type="long" column="id">
+       	 <generator class="native"/> 
+      </id>
+      <property name="userName" column="userName" type="string"/>
+      <property name="date" column="date" type="string"/>
+      <set name="todaysEtries" cascade="all">  
+          <key column="todaysEtries"></key>  
+          <one-to-many class="com.ram.sod.dto.TaskEntry"/>  
+	  </set> 
+	  <set name="yestardayEntry" cascade="all">  
+          <key column="yestardayEntry"></key>  
+          <one-to-many class="com.ram.sod.dto.TaskEntry"/>  
+      </set>
+   </class>
+  
+
+	 <class name="com.ram.sod.dto.Blockers" table="blockers">
+      <meta attribute="class-description">
+         This class contains the user details. 
+      </meta>
+      <id name="id" type="long" column="id">
+         <!-- <generator class="native"/> -->
+      </id>
+      <property name="text" column="text" type="string"/>
+      <property name="createdBy" column="createdBy" type="string"/>
+      <property name="sevirity" column="sevirity" type="string"/>
+      <property name="date" column="date" type="string"/>      
+   </class>
+   
+</hibernate-mapping>
